@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FitxApp — Control Horari</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- =====================================================
+     PANTALLA DE LOGIN
+     ===================================================== -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="icon">⏱</div>
+      <div>
+        <h1>FitxApp</h1>
+        <p>Control Horari · RDL 8/2019</p>
+      </div>
+    </div>
+
+    <h2>Accedir al sistema</h2>
+    <p class="sub">Selecciona el teu perfil i introdueix el codi d'accés</p>
+
+    <label class="field-label">Empleat/da</label>
+    <select id="login-user">
+      <option value="">— Selecciona un usuari —</option>
+      <option value="maria">Maria García (Comptabilitat)</option>
+      <option value="joan">Joan Martínez (Vendes)</option>
+      <option value="laura">Laura Puig (IT)</option>
+      <option value="admin">👑 Administrador (Empresa)</option>
+    </select>
+
+    <label class="field-label">Codi d'accés (PIN)</label>
+    <input type="password" id="login-pin" placeholder="••••" maxlength="4" />
+
+    <button class="btn btn-primary" onclick="doLogin()">Entrar al sistema</button>
+
+    <p style="font-size:11px;color:var(--muted);margin-top:1rem;text-align:center;">
+      PIN demo: <strong>1234</strong> per a tots els usuaris
+    </p>
+  </div>
+</div>
+
+<!-- =====================================================
+     APLICACIÓ PRINCIPAL
+     ===================================================== -->
+<div id="app">
+  <!-- Capçalera -->
+  <header>
+    <div class="header-logo">
+      <span>⏱ FitxApp</span>
+      <span class="dot"></span>
+    </div>
+    <div class="header-user">
+      <div class="avatar" id="header-avatar">?</div>
+      <span id="header-name">—</span>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()">Sortir</button>
+    </div>
+  </header>
+
+  <!-- Navegació per pestanyes -->
+  <nav>
+    <button class="nav-tab active" data-tab="fitxatge">📍 Fitxatge</button>
+    <button class="nav-tab" data-tab="historial">📋 Historial</button>
+    <button class="nav-tab" data-tab="absencies">🗓 Absències</button>
+    <button class="nav-tab tab-admin admin-only" data-tab="admin">👑 Admin</button>
+  </nav>
+
+  <!-- Contenidor principal -->
+  <main>
+    <div id="alerts-container"></div>
+
+    <!-- ==========================================
+         SECCIÓ: FITXATGE
+         ========================================== -->
+    <section class="section active" id="sec-fitxatge">
+
+      <!-- Rellotge en temps real -->
+      <div class="clock-block">
+        <div>
+          <div class="clock-time" id="clock-display">00:00:00</div>
+          <div class="clock-date" id="date-display">—</div>
+        </div>
+        <div>
+          <div id="status-badge" class="status-badge badge-inactive">
+            <span class="dot2"></span>
+            <span id="status-text">Sense fitxar</span>
+          </div>
+          <div style="margin-top:8px;font-size:12px;color:var(--muted);" id="session-timer">—</div>
+        </div>
+      </div>
+
+      <!-- Estadístiques de la jornada -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="sc-label">Inici jornada</div>
+          <div class="sc-value green" id="stat-start">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Hores treballades</div>
+          <div class="sc-value" id="stat-worked">0h 0min</div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="hours-bar" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Temps pausa</div>
+          <div class="sc-value amber" id="stat-pause">0min</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Fi de jornada</div>
+          <div class="sc-value" id="stat-end">—</div>
+        </div>
+      </div>
+
+      <!-- Botons d'acció principals -->
+      <div class="action-grid">
+        <button class="action-card ac-start" id="btn-start" onclick="startWork()">
+          <span class="ac-icon">▶️</span>
+          <div class="ac-title">Iniciar jornada</div>
+          <div class="ac-sub">Registra l'entrada al treball</div>
+        </button>
+        <button class="action-card ac-pause" id="btn-pause" onclick="startPause()" disabled>
+          <span class="ac-icon">⏸️</span>
+          <div class="ac-title">Iniciar pausa</div>
+          <div class="ac-sub">Dinar / descans obligatori</div>
+        </button>
+        <button class="action-card ac-resume" id="btn-resume" onclick="endPause()" disabled>
+          <span class="ac-icon">⏭️</span>
+          <div class="ac-title">Reprendre feina</div>
+          <div class="ac-sub">Tornar de la pausa</div>
+        </button>
+        <button class="action-card ac-end" id="btn-end" onclick="confirmEndWork()" disabled>
+          <span class="ac-icon">⏹️</span>
+          <div class="ac-title">Finalitzar jornada</div>
+          <div class="ac-sub">Registra la sortida</div>
+        </button>
+      </div>
+
+      <!-- Registre del dia actual -->
+      <div class="card">
+        <div class="card-header">
+          <h3>📝 Registre d'avui</h3>
+          <span style="font-size:12px;color:var(--muted);">Registre objectiu · No modificable</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr><th>Hora</th><th>Esdeveniment</th><th>Notes</th></tr>
+            </thead>
+            <tbody id="today-log">
+              <tr><td colspan="3" class="empty-state">No hi ha registres avui</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <p class="legal-note">
+        🔒 Les hores registrades son objectives i immutables · Compliment RDL 8/2019 · Dades conservades 4 anys · UTC+1 (Madrid)
+      </p>
+    </section>
+
+    <!-- ==========================================
+         SECCIÓ: HISTORIAL
+         ========================================== -->
+    <section class="section" id="sec-historial">
+      <div class="card">
+        <div class="card-header">
+          <h3>📋 Historial de jornades</h3>
+          <div class="export-row">
+            <select id="hist-month" style="width:auto;margin:0;" onchange="renderHistory()"></select>
+            <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ CSV</button>
+            <button class="btn btn-primary btn-sm" onclick="exportPDF()">⬇ Resum PDF</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th><th>Entrada</th><th>Sortida</th>
+                <th>Pauses</th><th>Hores netes</th><th>Extra</th><th>Estat</th>
+              </tr>
+            </thead>
+            <tbody id="history-body">
+              <tr><td colspan="7" class="empty-state">Sense registres</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-body" style="border-top:1px solid var(--border);">
+          <div class="stats-row" id="summary-stats"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECCIÓ: ABSÈNCIES
+         ========================================== -->
+    <section class="section" id="sec-absencies">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.25rem;">
+
+        <div class="card">
+          <div class="card-header"><h3>✉️ Sol·licitar absència o vacances</h3></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label>Tipus d'absència</label>
+              <select id="abs-type">
+                <option value="vacances">Vacances</option>
+                <option value="baixa">Baixa mèdica</option>
+                <option value="assumptes">Assumptes propis</option>
+                <option value="formacio">Formació</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Data inici</label>
+                <input type="date" id="abs-start" />
+              </div>
+              <div class="form-group">
+                <label>Data fi</label>
+                <input type="date" id="abs-end" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Motiu / Notes</label>
+              <textarea id="abs-notes" placeholder="Descriu el motiu..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Justificant (simulat)</label>
+              <input type="file" id="abs-file" accept=".pdf,.jpg,.png" />
+              <p style="font-size:11px;color:var(--muted);margin-top:4px;">PDF o imatge. Simulació: no es puja cap fitxer real.</p>
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="submitAbsence()">Enviar sol·licitud</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3>📂 Les meves sol·licituds</h3></div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead>
+                <tr><th>Tipus</th><th>Dates</th><th>Estat</th></tr>
+              </thead>
+              <tbody id="absences-body">
+                <tr><td colspan="3" class="empty-state">Cap sol·licitud</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECCIÓ: ADMINISTRADOR
+         ========================================== -->
+    <section class="section admin-only" id="sec-admin">
+
+      <div class="stats-row" id="admin-kpis"></div>
+
+      <div class="admin-grid">
+        <div class="card">
+          <div class="card-header"><h3>🟢 Treballant ara</h3></div>
+          <div class="card-body" id="admin-working"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>🟡 En pausa</h3></div>
+          <div class="card-body" id="admin-paused"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>⚠️ Alertes actives</h3></div>
+          <div class="card-body" id="admin-alerts-body"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>📊 Tots els registres (Auditoria RDL 8/2019)</h3>
+          <div class="export-row">
+            <select id="admin-filter-user" style="width:auto;margin:0;" onchange="renderAdminTable()">
+              <option value="all">Tots els usuaris</option>
+              <option value="maria">Maria García</option>
+              <option value="joan">Joan Martínez</option>
+              <option value="laura">Laura Puig</option>
+            </select>
+            <button class="btn btn-outline btn-sm" onclick="exportAllCSV()">⬇ Exportar tot</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Empleat/da</th><th>Data</th><th>Entrada</th>
+                <th>Sortida</th><th>Hores netes</th><th>Extra</th><th>Estat</th>
+              </tr>
+            </thead>
+            <tbody id="admin-table-body">
+              <tr><td colspan="7" class="empty-state">Sense registres</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h3>📬 Sol·licituds d'absència pendents</h3></div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr><th>Empleat/da</th><th>Tipus</th><th>Dates</th><th>Notes</th><th>Acció</th></tr>
+            </thead>
+            <tbody id="admin-absences-body">
+              <tr><td colspan="5" class="empty-state">Cap sol·licitud pendent</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+  </main>
+</div>
+
+<!-- =====================================================
+     MODAL CONFIRMACIÓ FI JORNADA
+     ===================================================== -->
+<div class="modal-overlay" id="modal-end">
+  <div class="modal">
+    <h3>Finalitzar jornada?</h3>
+    <p>Estàs a punt de registrar la sortida. Aquesta acció <strong>no es pot desfer</strong>. Hora actual: <span id="modal-end-time">—</span></p>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeModal('modal-end')">Cancel·lar</button>
+      <button class="btn btn-danger"  onclick="endWork()">Confirmar sortida</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast de notificació -->
+<div id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

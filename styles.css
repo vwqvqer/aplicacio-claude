@@ -1,0 +1,561 @@
+/* ===================================================
+   FITXAPP — CONTROL HORARI
+   Compliment RDL 8/2019
+   styles.css
+   =================================================== */
+
+/* ===================================================
+   VARIABLES I RESET GLOBAL
+   =================================================== */
+:root {
+  --bg:        #0e1117;
+  --bg2:       #161b25;
+  --bg3:       #1e2535;
+  --border:    #2a3348;
+  --text:      #e8edf5;
+  --muted:     #7a8aaa;
+  --accent:    #3d8ef0;
+  --accent2:   #1a6fd4;
+  --green:     #22c78a;
+  --green2:    #178f62;
+  --amber:     #f5a623;
+  --red:       #ef4444;
+  --purple:    #8b5cf6;
+  --radius:    12px;
+  --radius-sm: 8px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* ===================================================
+   PANTALLA DE LOGIN
+   =================================================== */
+#login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: radial-gradient(ellipse at 30% 20%, #1a2744 0%, var(--bg) 60%);
+}
+
+.login-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 420px;
+}
+
+.login-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 2rem;
+}
+
+.login-logo .icon {
+  width: 44px;
+  height: 44px;
+  background: var(--accent);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.login-logo h1 { font-size: 22px; font-weight: 600; }
+.login-logo p  { font-size: 12px; color: var(--muted); }
+
+.login-card h2     { font-size: 18px; font-weight: 500; margin-bottom: 0.25rem; }
+.login-card p.sub  { font-size: 13px; color: var(--muted); margin-bottom: 1.75rem; }
+
+label.field-label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+/* ===================================================
+   INPUTS I SELECTS
+   =================================================== */
+select,
+input[type="password"] {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 14px;
+  margin-bottom: 1rem;
+  outline: none;
+  transition: border-color .2s;
+}
+
+select:focus,
+input[type="password"]:focus { border-color: var(--accent); }
+
+input[type="text"],
+input[type="date"],
+textarea,
+input[type="file"] {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color .2s;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus,
+textarea:focus { border-color: var(--accent); }
+
+textarea { resize: vertical; min-height: 80px; }
+
+/* ===================================================
+   BOTONS
+   =================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  transition: opacity .15s, transform .1s;
+}
+
+.btn:active   { transform: scale(.98); }
+.btn:hover    { opacity: .88; }
+
+.btn-primary  { background: var(--accent); color: #fff; width: 100%; }
+.btn-success  { background: var(--green);  color: #fff; }
+.btn-danger   { background: var(--red);    color: #fff; }
+.btn-amber    { background: var(--amber);  color: #1a1a1a; }
+.btn-outline  { background: transparent; border: 1px solid var(--border); color: var(--text); }
+.btn-ghost    { background: transparent; color: var(--muted); border: none; }
+.btn-sm       { padding: 6px 14px; font-size: 13px; }
+.btn:disabled { opacity: .35; cursor: not-allowed; }
+
+/* ===================================================
+   LAYOUT PRINCIPAL
+   =================================================== */
+#app { display: none; flex-direction: column; min-height: 100vh; }
+
+header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-logo { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 16px; }
+.header-logo .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+.header-user { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); }
+
+.avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--accent2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; color: #fff;
+}
+
+nav {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 1.5rem;
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+}
+
+.nav-tab {
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color .2s, border-color .2s;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-family: inherit;
+}
+
+.nav-tab:hover  { color: var(--text); }
+.nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+main { flex: 1; padding: 1.5rem; max-width: 1100px; margin: 0 auto; width: 100%; }
+
+/* ===================================================
+   SECCIONS DE L'APP (mostrar/ocultar)
+   =================================================== */
+.section        { display: none; }
+.section.active { display: block; }
+
+/* ===================================================
+   RELLOTGE EN TEMPS REAL
+   =================================================== */
+.clock-block {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.clock-time {
+  font-family: 'DM Mono', monospace;
+  font-size: clamp(2.2rem, 6vw, 3.5rem);
+  font-weight: 500;
+  letter-spacing: -1px;
+  color: var(--text);
+}
+
+.clock-date { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+/* ===================================================
+   BADGE D'ESTAT
+   =================================================== */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge .dot2 { width: 6px; height: 6px; border-radius: 50%; }
+
+.badge-inactive       { background: rgba(255,255,255,.06); color: var(--muted); }
+.badge-inactive .dot2 { background: var(--muted); }
+
+.badge-working        { background: rgba(34,199,138,.12); color: var(--green); }
+.badge-working  .dot2 { background: var(--green); animation: pulse 2s infinite; }
+
+.badge-paused         { background: rgba(245,166,35,.12); color: var(--amber); }
+.badge-paused   .dot2 { background: var(--amber); }
+
+/* ===================================================
+   BOTONS DE FITXATGE (targetes d'acció)
+   =================================================== */
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.action-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+  text-align: left;
+}
+
+.action-card:hover:not(:disabled) { border-color: var(--accent); background: var(--bg3); }
+.action-card:disabled              { opacity: .3; cursor: not-allowed; }
+
+.action-card .ac-icon  { font-size: 24px; margin-bottom: 10px; display: block; }
+.action-card .ac-title { font-weight: 600; font-size: 14px; }
+.action-card .ac-sub   { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+/* Colors específics per cada botó d'acció */
+.ac-start { border-color: rgba(34,199,138,.4) !important; }
+.ac-start:hover:not(:disabled)  { background: rgba(34,199,138,.08) !important; }
+
+.ac-end   { border-color: rgba(239,68,68,.4) !important; }
+.ac-end:hover:not(:disabled)    { background: rgba(239,68,68,.08) !important; }
+
+.ac-pause  { border-color: rgba(245,166,35,.4) !important; }
+.ac-pause:hover:not(:disabled)  { background: rgba(245,166,35,.08) !important; }
+
+.ac-resume { border-color: rgba(61,142,240,.4) !important; }
+.ac-resume:hover:not(:disabled) { background: rgba(61,142,240,.08) !important; }
+
+/* ===================================================
+   ESTADÍSTIQUES DE LA JORNADA
+   =================================================== */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+}
+
+.stat-card .sc-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.stat-card .sc-value { font-size: 22px; font-weight: 600; font-family: 'DM Mono', monospace; }
+
+.sc-value.green { color: var(--green); }
+.sc-value.amber { color: var(--amber); }
+.sc-value.red   { color: var(--red); }
+
+/* ===================================================
+   BARRA DE PROGRÉS JORNADA
+   =================================================== */
+.progress-bar-wrap {
+  background: var(--bg3);
+  border-radius: 999px;
+  height: 6px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--green);
+  transition: width .5s ease;
+}
+
+.progress-bar-fill.over { background: var(--red); }
+
+/* ===================================================
+   ALERTES
+   =================================================== */
+#alerts-container { margin-bottom: 1.5rem; }
+
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  margin-bottom: 8px;
+  animation: slideIn .3s ease;
+}
+
+@keyframes slideIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+
+.alert-warning { background: rgba(245,166,35,.12); border: 1px solid rgba(245,166,35,.3); color: #fbbf24; }
+.alert-error   { background: rgba(239,68,68,.12);  border: 1px solid rgba(239,68,68,.3);  color: #f87171; }
+.alert-info    { background: rgba(61,142,240,.12); border: 1px solid rgba(61,142,240,.3); color: #60a5fa; }
+
+/* ===================================================
+   CARDS I TAULES
+   =================================================== */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.card-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.card-header h3 { font-size: 15px; font-weight: 600; }
+.card-body      { padding: 1.25rem; }
+
+table           { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th        { text-align: left; padding: 8px 12px; color: var(--muted); font-weight: 500; border-bottom: 1px solid var(--border); }
+tbody td        { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.04); }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td      { background: rgba(255,255,255,.02); }
+
+/* ===================================================
+   PILLS (etiquetes d'estat)
+   =================================================== */
+.pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.pill-green  { background: rgba(34,199,138,.15); color: var(--green); }
+.pill-amber  { background: rgba(245,166,35,.15); color: var(--amber); }
+.pill-red    { background: rgba(239,68,68,.15);  color: var(--red); }
+.pill-blue   { background: rgba(61,142,240,.15); color: var(--accent); }
+.pill-gray   { background: rgba(255,255,255,.07); color: var(--muted); }
+.pill-purple { background: rgba(139,92,246,.15); color: var(--purple); }
+
+/* ===================================================
+   DASHBOARD D'ADMINISTRADOR
+   =================================================== */
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.worker-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+}
+
+.worker-row:last-child { border-bottom: none; }
+.worker-name { font-size: 13px; font-weight: 500; flex: 1; }
+.worker-info { font-size: 12px; color: var(--muted); }
+
+/* ===================================================
+   FORMULARIS D'ABSÈNCIES
+   =================================================== */
+.form-group       { margin-bottom: 1rem; }
+.form-group label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+.form-row         { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* ===================================================
+   EXPORTACIÓ
+   =================================================== */
+.export-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ===================================================
+   MODAL
+   =================================================== */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.65);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 1.75rem;
+  width: 100%;
+  max-width: 440px;
+}
+
+.modal h3    { font-size: 16px; font-weight: 600; margin-bottom: .5rem; }
+.modal p     { font-size: 13px; color: var(--muted); margin-bottom: 1.25rem; }
+.modal-btns  { display: flex; gap: 8px; justify-content: flex-end; }
+
+/* ===================================================
+   TOAST NOTIFICACIÓ
+   =================================================== */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 18px;
+  font-size: 13px;
+  z-index: 300;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .3s, transform .3s;
+  pointer-events: none;
+  max-width: 300px;
+}
+
+#toast.show { opacity: 1; transform: translateY(0); }
+
+/* ===================================================
+   NOTA LEGAL
+   =================================================== */
+.legal-note {
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+  padding: 0.75rem;
+  border-top: 1px solid var(--border);
+  margin-top: 2rem;
+}
+
+/* Pestanya Admin */
+.tab-admin { color: var(--purple) !important; }
+
+/* Estat buit de taules */
+.empty-state { text-align: center; color: var(--muted); padding: 2rem; font-size: 13px; }
+
+input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+
+/* ===================================================
+   RESPONSIVE (mòbil)
+   =================================================== */
+@media (max-width: 640px) {
+  main        { padding: 1rem; }
+  .clock-block { flex-direction: column; align-items: flex-start; }
+  nav         { padding: 0 1rem; }
+  .form-row   { grid-template-columns: 1fr; }
+}
