@@ -1,0 +1,22 @@
+{
+  "name": "FitxApp — Control Horari",
+  "short_name": "FitxApp",
+  "description": "Aplicació de control horari per a empreses. Compliment RDL 8/2019.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0e1117",
+  "theme_color": "#3d8ef0",
+  "lang": "ca",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "business"],
+  "screenshots": []
+}
